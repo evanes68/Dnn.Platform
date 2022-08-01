@@ -25,9 +25,26 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
 
         private readonly int executionTimeout = 5000; // Limit timeout to 5 seconds as cache operations should be quick
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleWebFarmCachingProvider"/> class.
+        /// Constructor for this class.
+        /// </summary>
+        public SimpleWebFarmCachingProvider()
+        {
+            if (Logger.IsDebugEnabled)
+            {
+                Logger.Debug("Cache::SimpleWebFarmCachingProvider::");
+            }
+        }
+
         /// <inheritdoc/>
         public override void Clear(string type, string data)
         {
+            if (Logger.IsDebugEnabled)
+            {
+                Logger.Debug("Cache::Clear::" + type);
+            }
+
             // Clear the local cache
             this.ClearCacheInternal(type, data, true);
 
@@ -44,6 +61,11 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
         /// <inheritdoc/>
         public override void Remove(string key)
         {
+            if (Logger.IsDebugEnabled)
+            {
+                Logger.Debug("Cache::Remove::" + key);
+            }
+
             // Remove from local cache
             this.RemoveInternal(key);
 
@@ -55,6 +77,17 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
 
             // Notify Other Servers
             this.NotifyOtherServers("Remove", key);
+        }
+
+        /// <inheritdoc/>
+        public override object GetItem(string cacheKey)
+        {
+            if (Logger.IsDebugEnabled)
+            {
+                Logger.Debug("Cache::GetItem::" + cacheKey);
+            }
+
+            return base.GetItem(cacheKey);
         }
 
         /// <summary>
