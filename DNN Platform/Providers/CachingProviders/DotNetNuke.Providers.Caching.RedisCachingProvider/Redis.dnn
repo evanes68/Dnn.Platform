@@ -1,0 +1,57 @@
+﻿<dotnetnuke type="Package" version="5.0">
+  <packages>
+    <package name="DotNetNuke.Providers.Caching.Redis" type="Provider" isSystem="true" version="09.10.02">
+      <friendlyName>DotNetNuke Redis Caching Provider</friendlyName>
+      <description>DotNetNuke Redis Caching Provider</description>
+      <dependencies/>
+      <owner>
+        <name>.NET Foundation and Contributors</name>
+        <organization>DNN Community</organization>
+        <url>https://dnncommunity.org</url>
+        <email>info@dnncommunity.org</email>
+      </owner>
+      <license src="license.txt" />
+      <releaseNotes src="releaseNotes.txt" /> 
+      <azureCompatible>true</azureCompatible>
+      <components>
+        <component type="Assembly">
+          <assemblies>
+            <assembly>
+              <path>bin\Providers</path>
+              <name>DotNetNuke.Providers.Caching.RedisCachingProvider.dll</name>
+            </assembly>
+             <assembly>
+                <path>bin\Providers</path>
+                <name>StackExchange.Redis.dll</name>
+             </assembly>
+          </assemblies>
+        </component>
+        <component type="Config">
+          <config>
+            <configFile>web.config</configFile>
+            <install>
+              <configuration>
+                <nodes>
+                  <node path="/configuration/dotnetnuke/caching/providers" action="update" key="name" collision="overwrite">
+                    <add name="RedisCachingProvider"
+                         type="DotNetNuke.Providers.Caching.Redis.RedisCachingProvider, DotNetNuke.Providers.Caching.RedisCachingProvider"
+                         providerPath="~\Providers\CachingProviders\RedisCachingProvider\" />
+                  </node>
+                </nodes>
+              </configuration>
+            </install>
+            <uninstall>
+              <configuration>
+                <nodes>
+                  <node path="/configuration/dotnetnuke/caching/providers/add[@name='RedisCachingProvider']" action="remove" />
+                  <!-- Clear any default to prevent issues loading the site -->
+                  <node path="/configuration/dotnetnuke/caching" action="updateattribute"  name="defaultProvider" value="" />
+                </nodes>
+              </configuration>
+            </uninstall>
+          </config>
+        </component>
+      </components>
+    </package>
+  </packages>
+</dotnetnuke>
