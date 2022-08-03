@@ -454,11 +454,6 @@ namespace DotNetNuke.Providers.Caching.RedisCachingProvider
         {
             try
             {
-                if (!bool.Parse(GetProviderConfigAttribute("silentMode", "false")))
-                {
-                    return false;
-                }
-
                 if (e.GetType() != typeof(ConfigurationErrorsException) && value != null)
                 {
                     Logger.Error(
