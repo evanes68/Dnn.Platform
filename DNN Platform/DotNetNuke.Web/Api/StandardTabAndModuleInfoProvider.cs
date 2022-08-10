@@ -151,9 +151,11 @@ namespace DotNetNuke.Web.Api
             {
                 var queryString = HttpUtility.ParseQueryString(requestMessage.RequestUri.Query);
                 value = queryString[key];
+
+                return GetTabModuleInfoFromMoniker(value);
             }
 
-            return GetTabModuleInfoFromMoniker(value);
+            return Null.NullInteger;
         }
 
         private static int GetTabModuleInfoFromMoniker(string monikerValue)
@@ -166,11 +168,11 @@ namespace DotNetNuke.Web.Api
                 {
                     return ids.First();
                 }
-            }
 
-            if (Logger.IsWarnEnabled)
-            {
-                Logger.WarnFormat("The specified moniker ({0}) is not defined in the system", monikerValue);
+                if (Logger.IsWarnEnabled)
+                {
+                    Logger.WarnFormat("The specified moniker ({0}) is not defined in the system", monikerValue);
+                }
             }
 
             return Null.NullInteger;
