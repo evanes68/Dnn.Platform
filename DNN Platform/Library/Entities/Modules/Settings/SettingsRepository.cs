@@ -54,13 +54,17 @@ namespace DotNetNuke.Entities.Modules.Settings
         /// <inheritdoc/>
         public T GetSettings(ModuleInfo moduleContext)
         {
-            return CBO.GetCachedObject<T>(new CacheItemArgs(this.CacheKey(moduleContext.TabModuleID), 20, CacheItemPriority.AboveNormal, moduleContext), this.Load, false);
+            // TODO, Evert waarom saveindictionary false? zou op zijn minst documentatie bij moeten staan waarom!
+
+            return CBO.GetCachedObject<T>(new CacheItemArgs(this.CacheKey(moduleContext.TabModuleID), 20, CacheItemPriority.AboveNormal, moduleContext), this.Load);
         }
 
         /// <inheritdoc/>
         public T GetSettings(int portalId)
         {
-            return CBO.GetCachedObject<T>(new CacheItemArgs(this.CacheKey(portalId), 20, CacheItemPriority.AboveNormal, null, portalId), this.Load, false);
+            // TODO, Evert waarom saveindictionary false? zou op zijn minst documentatie bij moeten staan waarom!
+
+            return CBO.GetCachedObject<T>(new CacheItemArgs(this.CacheKey(portalId), 20, CacheItemPriority.AboveNormal, null, portalId), this.Load);
         }
 
         /// <inheritdoc/>

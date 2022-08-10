@@ -457,8 +457,9 @@ namespace DotNetNuke.Common.Utilities
 
         public static TObject GetCachedData<TObject>(CacheItemArgs cacheItemArgs, CacheItemExpiredCallback cacheItemExpired)
         {
+            //TODO: Evert, deze default false zorgt voor heel veel extra calls naar externe cache.
             // declare local object and try and retrieve item from the cache
-            return GetCachedData<TObject>(cacheItemArgs, cacheItemExpired, false);
+            return GetCachedData<TObject>(cacheItemArgs, cacheItemExpired, true);
         }
 
         public static TObject GetCache<TObject>(string CacheKey)

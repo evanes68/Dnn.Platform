@@ -168,6 +168,8 @@ namespace DotNetNuke.Services.Localization
                 Dictionary<string, Locale> locales;
                 if (Globals.Status != Globals.UpgradeStatus.Install)
                 {
+                    // TODO, Evert waarom saveindictionary true? op zich goede waarde.
+
                     string cacheKey = string.Format(DataCache.LocalesCacheKey, portalID);
                     locales = CBO.GetCachedObject<Dictionary<string, Locale>>(new CacheItemArgs(cacheKey, DataCache.LocalesCacheTimeOut, DataCache.LocalesCachePriority, portalID), GetLocalesCallBack, true);
                 }

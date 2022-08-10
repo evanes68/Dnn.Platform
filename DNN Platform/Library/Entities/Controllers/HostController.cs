@@ -118,6 +118,7 @@ namespace DotNetNuke.Entities.Controllers
         /// <inheritdoc/>
         IDictionary<string, IConfigurationSetting> IHostSettingsService.GetSettings()
         {
+            // TODO, Evert waarom saveindictionary true? op zich goed.
             return CBO.GetCachedObject<Dictionary<string, IConfigurationSetting>>(
                                             new CacheItemArgs(
                                                 DataCache.HostSettingsCacheKey,

@@ -176,6 +176,8 @@ namespace DotNetNuke.Services.Localization
         /// <inheritdoc/>
         public Dictionary<string, string> GetCompiledResourceFile(PortalSettings portalSettings, string resourceFile, string locale)
         {
+            // TODO, Evert waarom saveindictionary true? op zich goede waarde.
+
             return
                 CBO.GetCachedObject<Dictionary<string, string>>(
                     new CacheItemArgs(
@@ -345,6 +347,8 @@ namespace DotNetNuke.Services.Localization
 
         private static SharedDictionary<string, bool> GetResourceFileLookupDictionary()
         {
+            // TODO, Evert waarom saveindictionary true? op zich goede waarde.
+
             return
                 CBO.GetCachedObject<SharedDictionary<string, bool>>(
                     new CacheItemArgs(DataCache.ResourceFileLookupDictionaryCacheKey, DataCache.ResourceFileLookupDictionaryTimeOut, DataCache.ResourceFileLookupDictionaryCachePriority),
@@ -354,6 +358,8 @@ namespace DotNetNuke.Services.Localization
 
         private static Dictionary<string, string> GetResourceFile(string resourceFile)
         {
+            // TODO, Evert waarom saveindictionary true? op zich goede waarde.
+
             return CBO.GetCachedObject<Dictionary<string, string>>(
                 new CacheItemArgs(resourceFile, DataCache.ResourceFilesCacheTimeOut, DataCache.ResourceFilesCachePriority),
                 GetResourceFileCallBack,

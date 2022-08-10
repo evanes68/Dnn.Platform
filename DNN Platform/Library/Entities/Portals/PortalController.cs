@@ -2140,6 +2140,8 @@ namespace DotNetNuke.Entities.Portals
 
             if (dictionary == null)
             {
+                // TODO, Evert waarom saveindictionary true? Op zich goede waarde...
+
                 var cacheKey = string.Format(DataCache.PortalSettingsCacheKey, portalId, cultureCode);
                 dictionary = CBO.GetCachedObject<Dictionary<string, string>>(
                     new CacheItemArgs(

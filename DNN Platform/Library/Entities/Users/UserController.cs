@@ -2333,6 +2333,8 @@ namespace DotNetNuke.Entities.Users
 
         private static SharedDictionary<int, string> GetUserLookupDictionary(int portalId)
         {
+            // TODO, Evert waarom saveindictionary true? op zich goede waarde.
+
             var masterPortalId = GetEffectivePortalId(portalId);
             var cacheKey = string.Format(DataCache.UserLookupCacheKey, masterPortalId);
             return CBO.GetCachedObject<SharedDictionary<int, string>>(

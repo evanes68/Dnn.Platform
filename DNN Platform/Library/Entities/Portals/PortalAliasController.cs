@@ -222,6 +222,7 @@ namespace DotNetNuke.Entities.Portals
 
         internal Dictionary<string, PortalAliasInfo> GetPortalAliasesInternal()
         {
+            // TODO, Evert waarom saveindictionary goed? op zich goede waarde.
             return CBO.GetCachedObject<Dictionary<string, PortalAliasInfo>>(
                 new CacheItemArgs(
                 DataCache.PortalAliasCacheKey,
