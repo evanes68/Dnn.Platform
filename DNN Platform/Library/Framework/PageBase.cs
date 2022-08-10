@@ -517,7 +517,8 @@ namespace DotNetNuke.Framework
             foreach (Control c in controls)
             {
                 this.ProcessControl(c, affectedControls, true, resourceFileRoot);
-                this.LogDnnTrace("PageBase.IterateControls", "Info", $"ControlId: {c.ID}");
+                //TODO: Evert, deze is echt irritant.
+                //this.LogDnnTrace("PageBase.IterateControls", "Info", $"ControlId: {c.ID}");
             }
         }
 
