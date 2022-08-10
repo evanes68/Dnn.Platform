@@ -24,6 +24,7 @@ namespace DotNetNuke.Modules.Html
     public class WorkflowStateController
     {
         private const string WORKFLOW_CACHE_KEY = "Workflow{0}";
+        private const string WORKFLOWS_CACHE_KEY = "Workflows{0}";
         private const int WORKFLOW_CACHE_TIMEOUT = 20;
 
         private const CacheItemPriority WORKFLOW_CACHE_PRIORITY = CacheItemPriority.Normal;
@@ -39,6 +40,20 @@ namespace DotNetNuke.Modules.Html
         /// -----------------------------------------------------------------------------
         public ArrayList GetWorkflows(int PortalID)
         {
+            string cacheKey = string.Format(WORKFLOWS_CACHE_KEY, PortalID);
+            return CBO.GetCachedObject<ArrayList>(new CacheItemArgs(cacheKey, WORKFLOW_CACHE_TIMEOUT, WORKFLOW_CACHE_PRIORITY, PortalID), this.GetWorkflowsCallBack);
+        }
+
+        /// -----------------------------------------------------------------------------
+        /// <summary>
+        ///   GetWorkflowsCallBack retrieves a collection of WorkflowStateInfo objects for the Portal from the database.
+        /// </summary>
+        /// <param name = "cacheItemArgs">Arguments passed by the GetWorkflowStates method.</param>
+        /// <returns>WorkflowStateInfo List.</returns>
+        /// -----------------------------------------------------------------------------
+        public object GetWorkflowsCallBack(CacheItemArgs cacheItemArgs)
+        {
+            var PortalID = (int)cacheItemArgs.ParamList[0];
             return CBO.FillCollection(DataProvider.Instance().GetWorkflows(PortalID), typeof(WorkflowStateInfo));
         }
 
