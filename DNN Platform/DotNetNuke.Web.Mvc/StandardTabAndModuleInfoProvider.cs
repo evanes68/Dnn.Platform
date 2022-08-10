@@ -123,9 +123,11 @@ namespace DotNetNuke.Web.Mvc
             if (requestBase.Headers[key] != null)
             {
                 value = requestBase.Headers[key];
+
+                return GetTabModuleInfoFromMoniker(value);
             }
 
-            return GetTabModuleInfoFromMoniker(value);
+            return Null.NullInteger;
         }
 
         private static int FindIntInQueryString(HttpRequestBase requestBase, string key)
@@ -135,9 +137,11 @@ namespace DotNetNuke.Web.Mvc
             {
                 var queryString = HttpUtility.ParseQueryString(requestBase.Url.Query);
                 value = queryString[key];
+
+                return GetTabModuleInfoFromMoniker(value);
             }
 
-            return GetTabModuleInfoFromMoniker(value);
+            return Null.NullInteger;
         }
 
         private static int GetTabModuleInfoFromMoniker(string monikerValue)
@@ -150,11 +154,11 @@ namespace DotNetNuke.Web.Mvc
                 {
                     return ids.First();
                 }
-            }
 
-            if (Logger.IsWarnEnabled)
-            {
-                Logger.WarnFormat("The specified moniker ({0}) is not defined in the system", monikerValue);
+                if (Logger.IsWarnEnabled)
+                {
+                    Logger.WarnFormat("The specified moniker ({0}) is not defined in the system", monikerValue);
+                }
             }
 
             return Null.NullInteger;
