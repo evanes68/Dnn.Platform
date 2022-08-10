@@ -1878,6 +1878,7 @@ namespace DotNetNuke.Entities.Portals
             {
                 // get all tabs
                 int intField = 0;
+                //TODO: Evert dit is een zeer dure call. En gaan we in de database blokkeren! De vraag is wie wil nu alle tabs van alle portals in alle talen......
                 IDataReader dr = DataProvider.Instance().GetTabPaths(Null.NullInteger, Null.NullString);
                 try
                 {
