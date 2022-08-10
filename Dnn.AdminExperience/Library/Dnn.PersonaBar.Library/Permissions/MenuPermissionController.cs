@@ -98,6 +98,7 @@ namespace Dnn.PersonaBar.Library.Permissions
 
         public static MenuPermissionCollection GetMenuPermissions(int portalId, int menuId)
         {
+            //TODO: EVE expensive call to cache, is done for each menu item loading all menu permissions for a portal.
             var permissions = GetMenuPermissions(portalId)
                     .Cast<MenuPermissionInfo>()
                     .Where(p => p.MenuId == menuId && (p.PortalId == Null.NullInteger || p.PortalId == portalId)).ToList();
