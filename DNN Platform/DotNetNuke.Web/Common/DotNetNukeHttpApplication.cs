@@ -208,16 +208,18 @@ namespace DotNetNuke.Web.Common.Internal
         private void Application_BeginRequest(object sender, EventArgs e)
         {
             var app = (HttpApplication)sender;
-            var authCookie = app.Request.Cookies[FormsAuthentication.FormsCookieName];
-            if (authCookie != null && !IsInstallOrUpgradeRequest(app.Request))
-            {
-                // if the cookie is not in the database, then it is from before upgrading to 9.2.0 and don't fail
-                var persisted = AuthCookieController.Instance.Find(authCookie.Value);
-                if (persisted != null && persisted.ExpiresOn <= DateTime.UtcNow)
-                {
-                    app.Request.Cookies.Remove(FormsAuthentication.FormsCookieName);
-                }
-            }
+
+            // TODO: Evert, deze call zorgt voor twee database calls voor elke postback en 4 cache calls. Zonde omdat hij niets doet behalve een oude cookie verwijderen.
+            // var authCookie = app.Request.Cookies[FormsAuthentication.FormsCookieName];
+            // if (authCookie != null && !IsInstallOrUpgradeRequest(app.Request))
+            // {
+            //     // if the cookie is not in the database, then it is from before upgrading to 9.2.0 and don't fail
+            //     var persisted = AuthCookieController.Instance.Find(authCookie.Value);
+            //     if (persisted != null && persisted.ExpiresOn <= DateTime.UtcNow)
+            //     {
+            //         app.Request.Cookies.Remove(FormsAuthentication.FormsCookieName);
+            //     }
+            // }
 
             var requestUrl = app.Request.Url.LocalPath.ToLowerInvariant();
             if (!requestUrl.EndsWith(".aspx") && !requestUrl.EndsWith("/") && Endings.Any(requestUrl.EndsWith))
