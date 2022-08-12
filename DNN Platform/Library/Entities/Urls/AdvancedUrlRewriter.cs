@@ -2365,24 +2365,28 @@ namespace DotNetNuke.Entities.Urls
                         // add the portal settings to the app context if the portal alias has been found and is correct
                         if (result.PortalId != -1 && result.PortalAlias != null)
                         {
-                            // for invalid tab id other than -1, show the 404 page
-                            TabInfo tabInfo = TabController.Instance.GetTab(result.TabId, result.PortalId, false);
-                            if (tabInfo == null && result.TabId > -1)
-                            {
-                                finished = true;
+                            if (result.TabId > -1)
+                            {   
+                               // for invalid tab id other than -1, show the 404 page
+                               TabInfo tabInfo = TabController.Instance.GetTab(result.TabId, result.PortalId, false);
+                               if (tabInfo == null)
+                               {
+                                   finished = true;
 
-                                if (showDebug)
-                                {
-                                    ShowDebugData(context, requestUri.AbsoluteUri, result, null);
-                                }
+                                   if (showDebug)
+                                   {
+                                       ShowDebugData(context, requestUri.AbsoluteUri, result, null);
+                                   }
 
-                                // show the 404 page if configured
-                                result.Action = ActionType.Output404;
-                                result.Reason = RedirectReason.Requested_404;
-                                response.AppendHeader("X-Result-Reason", result.Reason.ToString().Replace("_", " "));
-                                Handle404OrException(settings, context, null, result, true, showDebug);
+                                   // show the 404 page if configured
+                                   result.Action = ActionType.Output404;
+                                   result.Reason = RedirectReason.Requested_404;
+                                   response.AppendHeader("X-Result-Reason", result.Reason.ToString().Replace("_", " "));
+                                   Handle404OrException(settings, context, null, result, true, showDebug);
+                               }
                             }
-                            else
+                            
+                            if (!finished)  
                             {
                                 Globals.SetApplicationName(result.PortalId);
 
