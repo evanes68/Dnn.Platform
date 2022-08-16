@@ -13,7 +13,7 @@ namespace DotNetNuke.Common.Utilities
     public class RegexUtils
     {
         /// <summary>
-        /// Creates and caches a Regex object for later use and retrieves it in a later call if it is cacehd.
+        /// Creates and caches a Regex object for later use and retrieves it in a later call if it is cached.
         /// </summary>
         /// <returns></returns>
         public static Regex GetCachedRegex(string pattern, RegexOptions options = RegexOptions.None, int timeoutSeconds = 2)
@@ -28,8 +28,20 @@ namespace DotNetNuke.Common.Utilities
             }
 
             // // should not allow for compiled dynamic regex object
-            options &= ~RegexOptions.Compiled;
             key = string.Join(":", "REGEX_ITEM", options.ToString("X"), key.GetHashCode().ToString("X"));
+
+            return CBO.GetCachedObject<Regex>(
+                new CacheItemArgs(
+                key,
+                10,
+                CacheItemPriority.BelowNormal),
+                c => _GetRegex(pattern, options & ~RegexOptions.Compiled, timeoutSeconds));
+
+        }
+
+        public static Regex _GetRegex(string pattern, RegexOptions options = RegexOptions.None, int timeoutSeconds = 2)
+        {
+            options &= ~RegexOptions.Compiled;
 
             // limit timeout between 1 and 10 seconds
             if (timeoutSeconds < 1)
@@ -41,15 +53,11 @@ namespace DotNetNuke.Common.Utilities
                 timeoutSeconds = 10;
             }
 
-            var cache = CachingProvider.Instance();
-            var regex = cache.GetItem(key) as Regex;
-            if (regex == null)
-            {
-                regex = new Regex(pattern, options & ~RegexOptions.Compiled, TimeSpan.FromSeconds(timeoutSeconds));
-                cache.Insert(key, regex, (DNNCacheDependency)null, Cache.NoAbsoluteExpiration, TimeSpan.FromMinutes(10), CacheItemPriority.BelowNormal, null);
-            }
-
+            var regex = new Regex(pattern, options, TimeSpan.FromSeconds(timeoutSeconds));
             return regex;
         }
+
+
+
     }
 }
