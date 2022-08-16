@@ -43,10 +43,10 @@ CREATE PROCEDURE {databaseOwner}[{objectQualifier}UpdatePortalInfo]
 AS
    DECLARE @AdminTabId int
    SET @AdminTabId = (SELECT tabid 
-                  FROM Tabs
+                  FROM {databaseOwner}[{objectQualifier}Tabs]
                   WHERE PortalID = @PortalID and culturecode is null and parentid is null)
 
-	UPDATE dbo.Portals
+	UPDATE {databaseOwner}[{objectQualifier}Portals]
 		SET    
 		   PortalGroupID		= @PortalGroupID,
 		   ExpiryDate			= @ExpiryDate,
@@ -68,9 +68,9 @@ AS
 		   LastModifiedOnDate	= GETDATE()
 	WHERE  PortalId = @PortalID
 
-   IF EXISTS (SELECT * FROM dbo.PortalLocalization WHERE PortalId = @PortalID AND CultureCode = @CultureCode)
+   IF EXISTS (SELECT * FROM {databaseOwner}[{objectQualifier}PortalLocalization] WHERE PortalId = @PortalID AND CultureCode = @CultureCode)
 	BEGIN 
-		UPDATE dbo.PortalLocalization
+		UPDATE {databaseOwner}[{objectQualifier}PortalLocalization]
 			SET
 				PortalName				= @PortalName,
 				LogoFile				= @LogoFile,
@@ -96,7 +96,7 @@ AS
 	END 
 ELSE
 	BEGIN 
-		INSERT INTO dbo.PortalLocalization (
+		INSERT INTO {databaseOwner}[{objectQualifier}PortalLocalization] (
 			[PortalID],
 			[CultureCode],
 			[PortalName],

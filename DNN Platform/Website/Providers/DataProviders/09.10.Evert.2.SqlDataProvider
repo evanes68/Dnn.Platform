@@ -12,7 +12,7 @@ AS
        END
 
        SELECT *
-       FROM   dbo.[vw_Tabs]
+       FROM   {databaseOwner}[{objectQualifier}vw_Tabs]
        where ((@PortalID is null) and (portalid is null) or (@PortalID is not null) and (portalid = @PortalID))
        ORDER BY PortalId, [Level], ParentID, TabOrder -- PortalId added for query optimization
 
