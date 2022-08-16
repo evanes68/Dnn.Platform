@@ -111,6 +111,7 @@ namespace DotNetNuke.Entities.Portals
                 foundAlias = aliasList.FirstOrDefault(a => a.BrowserType == browserType &&
                                                          (string.Compare(a.CultureCode, cultureCode,
                                                              StringComparison.OrdinalIgnoreCase) == 0)
+                                                         && a.IsPrimary
                                                          && a.PortalID == portalId
                                                          && a.HTTPAlias == result.HttpAlias);
                 if (foundAlias == null) // let us try again using Startswith() to find matching Hosts
