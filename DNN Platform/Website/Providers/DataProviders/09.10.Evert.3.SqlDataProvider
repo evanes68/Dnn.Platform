@@ -1,0 +1,28 @@
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}{objectQualifier}GetTabPaths') AND type in (N'P', N'PC'))
+DROP PROCEDURE {databaseOwner}{objectQualifier}GetTabPaths
+GO
+
+CREATE PROCEDURE {databaseOwner}[{objectQualifier}GetTabPaths]
+	@PortalID		INT,
+	@CultureCode	NVARCHAR(10)
+AS
+	IF @PortalID IS NOT NULL
+		BEGIN 
+			SELECT	TabID, 
+					PortalID, 
+					TabPath
+			FROM	{databaseOwner}[{objectQualifier}vw_Tabs]
+			WHERE	(PortalID = @PortalID AND (CultureCode = @CultureCode OR CultureCode IS NULL OR ISNULL(@CultureCode, '') = ''))
+			OR		PortalID IS NULL
+		END
+	ELSE
+      -- When @Portalid is null we do not want to return all records from the database, currently only host pages. On large Tabs tables this will lockup the application
+		BEGIN 
+			SELECT	TabID, 
+					PortalID, 
+					TabPath
+			FROM	{databaseOwner}[{objectQualifier}Tabs]
+			WHERE	PortalID IS NULL
+		END
+GO
