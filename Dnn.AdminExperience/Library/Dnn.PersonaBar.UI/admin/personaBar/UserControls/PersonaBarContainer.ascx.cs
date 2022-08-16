@@ -27,7 +27,20 @@ namespace Dnn.PersonaBar.UI.UserControls
     {
         private readonly IPersonaBarContainer _personaBarContainer = Library.Containers.PersonaBarContainer.Instance;
 
-        public string PersonaBarSettings => JsonConvert.SerializeObject(this._personaBarContainer.GetConfiguration());
+        private string personaBarSettings = null;
+        public string PersonaBarSettings
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.personaBarSettings))
+                {
+                    this.personaBarSettings = JsonConvert.SerializeObject(this._personaBarContainer.GetConfiguration());
+                }
+
+                return this.personaBarSettings;
+            }
+        }
+
 
         public string AppPath => Globals.ApplicationPath;
 

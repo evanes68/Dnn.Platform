@@ -49,37 +49,36 @@ namespace Dnn.PersonaBar.Library.Permissions
         public static MenuPermissionCollection GetMenuPermissions(int portalId)
         {
             var cacheKey = GetCacheKey(portalId);
-            var permissions = DataCache.GetCache<MenuPermissionCollection>(cacheKey);
-            if (permissions == null)
-            {
-                lock (ThreadLocker)
-                {
-                    permissions = DataCache.GetCache<MenuPermissionCollection>(cacheKey);
-                    if (permissions == null)
-                    {
-                        permissions = new MenuPermissionCollection();
-                        EnsureMenuDefaultPermissions(portalId);
-                        var reader = DataService.GetPersonbaBarMenuPermissionsByPortal(portalId);
-                        try
-                        {
-                            while (reader.Read())
-                            {
-                                var permissionInfo = CBO.FillObject<MenuPermissionInfo>(reader, false);
-                                permissions.Add(permissionInfo, true);
-                            }
 
-                            DataCache.SetCache(cacheKey, permissions);
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.Error(ex);
-                        }
-                        finally
-                        {
-                            CBO.CloseDataReader(reader, true);
-                        }
-                    }
+            return CBO.GetCachedObject<MenuPermissionCollection>(
+                        new CacheItemArgs(
+                        cacheKey,
+                        DataCache.ListsCacheTimeOut,
+                        DataCache.ListsCachePriority),
+                        c => _GetMenuPermissions(portalId));
+        }
+
+
+        public static MenuPermissionCollection _GetMenuPermissions(int portalId)
+        {
+            var permissions = new MenuPermissionCollection();
+            EnsureMenuDefaultPermissions(portalId);
+            var reader = DataService.GetPersonbaBarMenuPermissionsByPortal(portalId);
+            try
+            {
+                while (reader.Read())
+                {
+                    var permissionInfo = CBO.FillObject<MenuPermissionInfo>(reader, false);
+                    permissions.Add(permissionInfo, true);
                 }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                CBO.CloseDataReader(reader, true);
             }
 
             return permissions;
@@ -100,6 +99,7 @@ namespace Dnn.PersonaBar.Library.Permissions
         {
             //TODO: EVE expensive call to cache, is done for each menu item loading all menu permissions for a portal.
             var permissions = GetMenuPermissions(portalId)
+            // var permissions = portalMenuPermissions
                     .Cast<MenuPermissionInfo>()
                     .Where(p => p.MenuId == menuId && (p.PortalId == Null.NullInteger || p.PortalId == portalId)).ToList();
             return new MenuPermissionCollection(permissions);

@@ -20,33 +20,39 @@ namespace Dnn.PersonaBar.Library.Repository
         private const string PersonaBarMenuCacheKey = "PersonaBarMenu";
         private static readonly object ThreadLocker = new object();
         private readonly IDataService _dataService = new DataService();
+        private PersonaBarMenu personaBarMenuAll;
 
         public PersonaBarMenu GetMenu()
         {
-            var menu = DataCache.GetCache<PersonaBarMenu>(PersonaBarMenuCacheKey);
-            if (menu == null)
+            if (this.personaBarMenuAll == null)
             {
-                lock (ThreadLocker)
+                var menu = DataCache.GetCache<PersonaBarMenu>(PersonaBarMenuCacheKey);
+                if (menu == null)
                 {
-                    menu = DataCache.GetCache<PersonaBarMenu>(PersonaBarMenuCacheKey);
-                    if (menu == null)
+                    lock (ThreadLocker)
                     {
-                        menu = new PersonaBarMenu();
-                        var menuItems = CBO.FillCollection<MenuItem>(this._dataService.GetPersonaBarMenu())
-                            .OrderBy(m => m.Order).ToList();
-
-                        foreach (var menuItem in menuItems.Where(m => m.ParentId == Null.NullInteger))
+                        menu = DataCache.GetCache<PersonaBarMenu>(PersonaBarMenuCacheKey);
+                        if (menu == null)
                         {
-                            menu.MenuItems.Add(menuItem);
-                            this.InjectMenuItems(menuItem, menuItems);
-                        }
+                            menu = new PersonaBarMenu();
+                            var menuItems = CBO.FillCollection<MenuItem>(this._dataService.GetPersonaBarMenu())
+                                .OrderBy(m => m.Order).ToList();
 
-                        DataCache.SetCache(PersonaBarMenuCacheKey, menu);
+                            foreach (var menuItem in menuItems.Where(m => m.ParentId == Null.NullInteger))
+                            {
+                                menu.MenuItems.Add(menuItem);
+                                this.InjectMenuItems(menuItem, menuItems);
+                            }
+
+                            DataCache.SetCache(PersonaBarMenuCacheKey, menu);
+                        }
                     }
                 }
+
+                this.personaBarMenuAll = menu;
             }
 
-            return menu;
+            return this.personaBarMenuAll;
         }
 
         public MenuItem GetMenuItem(string identifier)
