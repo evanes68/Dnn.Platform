@@ -44,7 +44,7 @@ AS
    DECLARE @AdminTabId int
    SET @AdminTabId = (SELECT tabid 
                   FROM {databaseOwner}[{objectQualifier}Tabs]
-                  WHERE PortalID = @PortalID and culturecode is null and parentid is null)
+                  WHERE PortalID = @PortalID and culturecode is null and parentid is null and tabpath = '//admin')
 
 	UPDATE {databaseOwner}[{objectQualifier}Portals]
 		SET    
