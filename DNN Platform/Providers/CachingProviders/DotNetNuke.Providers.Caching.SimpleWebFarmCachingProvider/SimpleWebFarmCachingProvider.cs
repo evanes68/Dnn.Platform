@@ -42,7 +42,7 @@ namespace DotNetNuke.Providers.Caching.SimpleWebFarmCachingProvider
         {
             if (Logger.IsDebugEnabled)
             {
-                Logger.Debug("Cache::Clear::" + type);
+                Logger.Debug("Cache::Clear::" + type + " " + data);
             }
 
             // Clear the local cache
