@@ -13,6 +13,7 @@ namespace Dnn.PersonaBar.UI.Services.DTO
     using DotNetNuke.Security.Roles;
 
     [DataContract]
+    [Serializable]
     public class RoleGroupDto
     {
         /// <summary>
