@@ -18,12 +18,11 @@ namespace DotNetNuke.Modules.Html
     /// <summary>
     ///   The WorkflowStateController is the Controller class for managing workflows and states for the HtmlText module.
     /// </summary>
-    /// <remarks>
-    /// </remarks>
     /// -----------------------------------------------------------------------------
     public class WorkflowStateController
     {
         private const string WORKFLOWCACHEKEY = "Workflow{0}";
+        private const string WORKFLOWS_CACHE_KEY = "Workflows{0}";
         private const int WORKFLOWCACHETIMEOUT = 20;
 
         private const CacheItemPriority WORKFLOWCACHEPRIORITY = CacheItemPriority.Normal;
@@ -32,22 +31,32 @@ namespace DotNetNuke.Modules.Html
         /// <summary>
         ///   GetWorkFlows retrieves a collection of workflows for the portal.
         /// </summary>
-        /// <remarks>
-        /// </remarks>
         /// <param name = "portalID">The ID of the Portal.</param>
         /// <returns></returns>
         /// -----------------------------------------------------------------------------
         public ArrayList GetWorkflows(int portalID)
         {
-            return CBO.FillCollection(DataProvider.Instance().GetWorkflows(portalID), typeof(WorkflowStateInfo));
+            string cacheKey = string.Format(WORKFLOWS_CACHE_KEY, portalID);
+            return CBO.GetCachedObject<ArrayList>(new CacheItemArgs(cacheKey, WORKFLOWCACHETIMEOUT, WORKFLOWCACHEPRIORITY, portalID), this.GetWorkflowsCallBack);
+        }
+
+        /// -----------------------------------------------------------------------------
+        /// <summary>
+        ///   GetWorkflowsCallBack retrieves a collection of WorkflowStateInfo objects for the Portal from the database.
+        /// </summary>
+        /// <param name = "cacheItemArgs">Arguments passed by the GetWorkflowStates method.</param>
+        /// <returns>WorkflowStateInfo List.</returns>
+        /// -----------------------------------------------------------------------------
+        public object GetWorkflowsCallBack(CacheItemArgs cacheItemArgs)
+        {
+            var portalId = (int)cacheItemArgs.ParamList[0];
+            return CBO.FillCollection(DataProvider.Instance().GetWorkflows(portalId), typeof(WorkflowStateInfo));
         }
 
         /// -----------------------------------------------------------------------------
         /// <summary>
         ///   GetWorkFlowStates retrieves a collection of WorkflowStateInfo objects for the Workflow from the cache.
         /// </summary>
-        /// <remarks>
-        /// </remarks>
         /// <param name = "workflowID">The ID of the Workflow.</param>
         /// <returns></returns>
         /// -----------------------------------------------------------------------------
@@ -61,8 +70,6 @@ namespace DotNetNuke.Modules.Html
         /// <summary>
         ///   GetWorkFlowStatesCallback retrieves a collection of WorkflowStateInfo objects for the Workflow from the database.
         /// </summary>
-        /// <remarks>
-        /// </remarks>
         /// <param name = "cacheItemArgs">Arguments passed by the GetWorkflowStates method.</param>
         /// <returns></returns>
         /// -----------------------------------------------------------------------------
