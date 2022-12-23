@@ -151,10 +151,12 @@ namespace DotNetNuke.Web.Api
             {
                 var queryString = HttpUtility.ParseQueryString(requestMessage.RequestUri.Query);
                 value = queryString[key];
-            }
 
                 return GetTabModuleInfoFromMoniker(value);
             }
+
+            return Null.NullInteger;
+        }
 
         private static int GetTabModuleInfoFromMoniker(string monikerValue)
         {
