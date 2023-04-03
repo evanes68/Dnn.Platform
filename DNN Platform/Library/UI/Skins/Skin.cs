@@ -844,8 +844,10 @@ namespace DotNetNuke.UI.Skins
                 var redirectUrl = Globals.AccessDeniedURL(Localization.GetString("TabAccess.Error"));
 
                 // Current locale will use default if did'nt find any
+                // We need to add a check if the page has a language, and if not do not try and look for a default language version but trust the redirecturl
                 Locale currentLocale = LocaleController.Instance.GetCurrentLocale(this.PortalSettings.PortalId);
                 if (this.PortalSettings.ContentLocalizationEnabled &&
+                    !string.IsNullOrEmpty(TabController.CurrentPage.CultureCode) &&
                     TabController.CurrentPage.CultureCode != currentLocale.Code)
                 {
                     redirectUrl = new LanguageTokenReplace { Language = currentLocale.Code }.ReplaceEnvironmentTokens("[URL]");
