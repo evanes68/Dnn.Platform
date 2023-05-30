@@ -111,7 +111,13 @@ namespace DotNetNuke.Services.Installer.Packages
 
         public static IDictionary<int, PackageInfo> GetModulePackagesInUse(int portalID, bool forHost)
         {
-            return CBO.FillDictionary<int, PackageInfo>("PackageID", provider.GetModulePackagesInUse(portalID, forHost));
+            // Evert, deze routine wordt door de extensies/uitbreidingen pagina in een loop geladen met steeds dezelfde parameters. Door dit via cache te laten lopen voorkom ik dat.
+
+            var cacheKey = string.Format(DataCache.ModulePackagesInUseCacheKey, portalID, forHost);
+            var cacheItemArgs = new CacheItemArgs(cacheKey, DataCache.PackagesCacheTimeout, DataCache.PackagesCachePriority, portalID, forHost);
+            return CBO.GetCachedObject<IDictionary<int, PackageInfo>>(
+                cacheItemArgs,
+                c => CBO.FillDictionary<int, PackageInfo>("PackageID", provider.GetModulePackagesInUse(portalID, forHost)));
         }
 
         public static void ParsePackage(string file, string installPath, Dictionary<string, PackageInfo> packages, List<string> invalidPackages)

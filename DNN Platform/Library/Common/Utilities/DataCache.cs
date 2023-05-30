@@ -270,6 +270,7 @@ namespace DotNetNuke.Common.Utilities
         public const int SubscriptionTypesTimeOut = 20;
 
         public const string PackagesCacheKey = "Packages_{0}";
+        public const string ModulePackagesInUseCacheKey = "ModulePackagesInUse_{0}|{1}";
         public const string PackageDependenciesCacheKey = "Packages_Dependencies";
         public const CacheItemPriority PackagesCachePriority = CacheItemPriority.Default;
         public const int PackagesCacheTimeout = 20;

@@ -234,10 +234,15 @@ namespace DotNetNuke.Providers.Caching.RedisCachingProvider
                     expiry = slidingExpiration;
                 }
 
-                var storeobject = Serialize(value);
-                RedisCache.StringSet(key, storeobject, expiry);
-
-                // base.Insert(key, value, dependency, absoluteExpiration, slidingExpiration, priority, onRemoveCallback);
+                if (key.StartsWith("ECM"))
+                {
+                    var storeobject = Serialize(value);
+                    RedisCache.StringSet(key, storeobject, expiry);
+                }
+                else
+                {
+                    base.Insert(key, value, dependency, absoluteExpiration, slidingExpiration, priority, onRemoveCallback);
+                }
             }
             catch (Exception e)
             {
@@ -258,19 +263,34 @@ namespace DotNetNuke.Providers.Caching.RedisCachingProvider
         {
             if (Logger.IsDebugEnabled)
             {
-                Logger.Debug("Redis::GetItem::" + key);
+                if (key.StartsWith("DNN_PersonaBarMenuPermissionsXXX"))
+                {
+                    System.Diagnostics.StackTrace t = new System.Diagnostics.StackTrace();
+                    Logger.Debug("Redis::GetItem::" + key + " " + t.ToString());
+                }
+                else
+                {
+                    // Logger.Debug("Redis::GetItem::" + key);
+                }
             }
 
             try
             {
-                // var value = base.GetItem(key);
-                var value = RedisCache.StringGet(key);
-                if (value.HasValue)
+                if (key.StartsWith("ECM"))
                 {
-                    return Deserialize(value);
-                }
+                    var value = RedisCache.StringGet(key);
+                    if (value.HasValue)
+                    {
+                        return Deserialize(value);
+                    }
 
-                return null;
+                    return null;
+                }
+                else
+                {
+                    var value = base.GetItem(key);
+                    return value;
+                }
             }
             catch (Exception e)
             {
