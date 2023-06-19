@@ -2377,8 +2377,11 @@ namespace DotNetNuke.Entities.Urls
                         if (result.PortalId != -1 && result.PortalAlias != null)
                         {
                             // for invalid tab id other than -1, show the 404 page
-                            TabInfo tabInfo = TabController.Instance.GetTab(result.TabId, result.PortalId, false);
-                            if (tabInfo == null && result.TabId > -1)
+                            var tabInfo = result.TabId > -1 
+                                ? TabController.Instance.GetTab(result.TabId, result.PortalId, false) 
+                                : null;
+
+                            if (tabInfo == null)
                             {
                                 finished = true;
 
