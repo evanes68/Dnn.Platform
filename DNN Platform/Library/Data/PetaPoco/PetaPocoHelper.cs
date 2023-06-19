@@ -26,6 +26,13 @@ namespace DotNetNuke.Data.PetaPoco
 
         public static void ExecuteNonQuery(string connectionString, CommandType type, int timeoutSec, string sql, params object[] args)
         {
+            System.Diagnostics.Stopwatch loSW = null;
+            if (Logger.IsDebugEnabled)
+            {
+                loSW = new System.Diagnostics.Stopwatch();
+                loSW.Start();
+            }
+
             using (var database = new Database(connectionString, SqlProviderName) { EnableAutoSelect = false })
             {
                 if (type == CommandType.StoredProcedure)
@@ -47,6 +54,12 @@ namespace DotNetNuke.Data.PetaPoco
                     Logger.Error("[1] Error executing SQL: " + sql + Environment.NewLine + ex.Message);
                     throw;
                 }
+            }
+
+            if (Logger.IsDebugEnabled)
+            {
+                loSW.Stop();
+                Logger.Debug(logVerbose("ExecuteNonQuery", sql, loSW.ElapsedMilliseconds, args));
             }
         }
 
@@ -142,6 +155,13 @@ namespace DotNetNuke.Data.PetaPoco
 
         public static IDataReader ExecuteReader(string connectionString, CommandType type, int timeoutSec, string sql, params object[] args)
         {
+            System.Diagnostics.Stopwatch loSW = null;
+            if (Logger.IsDebugEnabled)
+            {
+                loSW = new System.Diagnostics.Stopwatch();
+                loSW.Start();
+            }
+
             var database = new Database(connectionString, SqlProviderName) { EnableAutoSelect = false };
 
             if (type == CommandType.StoredProcedure)
@@ -156,7 +176,14 @@ namespace DotNetNuke.Data.PetaPoco
 
             try
             {
-                return database.ExecuteReader(sql, args);
+                IDataReader loResult = database.ExecuteReader(sql, args);
+                if (Logger.IsDebugEnabled)
+                {
+                    loSW.Stop();
+                    Logger.Debug(logVerbose("ExecuteReader", sql, loSW.ElapsedMilliseconds, args));
+                }
+
+                return loResult;
             }
             catch (Exception ex)
             {
@@ -177,6 +204,13 @@ namespace DotNetNuke.Data.PetaPoco
 
         public static T ExecuteScalar<T>(string connectionString, CommandType type, int timeoutSec, string sql, params object[] args)
         {
+            System.Diagnostics.Stopwatch loSW = null;
+            if (Logger.IsDebugEnabled)
+            {
+                loSW = new System.Diagnostics.Stopwatch();
+                loSW.Start();
+            }
+
             using (var database = new Database(connectionString, SqlProviderName) { EnableAutoSelect = false })
             {
                 if (type == CommandType.StoredProcedure)
@@ -191,7 +225,14 @@ namespace DotNetNuke.Data.PetaPoco
 
                 try
                 {
-                    return database.ExecuteScalar<T>(sql, args);
+                    T loResult = database.ExecuteScalar<T>(sql, args);
+                    if (Logger.IsDebugEnabled)
+                    {
+                        loSW.Stop();
+                        Logger.Debug(logVerbose("ExecuteScalar", sql, loSW.ElapsedMilliseconds, args));
+                    }
+
+                    return loResult;
                 }
                 catch (Exception ex)
                 {
@@ -210,6 +251,13 @@ namespace DotNetNuke.Data.PetaPoco
         // ReSharper disable once InconsistentNaming
         public static void ExecuteSQL(string connectionString, string sql, int timeoutSec)
         {
+            System.Diagnostics.Stopwatch loSW = null;
+            if (Logger.IsDebugEnabled)
+            {
+                loSW = new System.Diagnostics.Stopwatch();
+                loSW.Start();
+            }
+
             using (var database = new Database(connectionString, SqlProviderName) { EnableAutoSelect = false })
             {
                 if (timeoutSec > 0)
@@ -220,6 +268,12 @@ namespace DotNetNuke.Data.PetaPoco
                 try
                 {
                     database.Execute(sql);
+
+                    if (Logger.IsDebugEnabled)
+                    {
+                        loSW.Stop();
+                        Logger.Debug(logVerbose("ExecuteSQL", sql, loSW.ElapsedMilliseconds));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -227,6 +281,27 @@ namespace DotNetNuke.Data.PetaPoco
                     throw;
                 }
             }
+        }
+
+        public static string logVerbose(string method, string psSql, long duration = -1, params object[] args)
+        {
+            string lsDuration = "";
+            if (duration > -1)
+            {
+                lsDuration = " Duration (ms): " + duration + (duration > 200 ? " ***" : "");
+            }
+
+            string lsParams = "";
+            if (args != null)
+            {
+                lsParams = " Params: ";
+                foreach (object loItem in args)
+                {
+                    lsParams += "[" + (loItem == null ? "" : loItem.ToString()) + "] ";
+                }
+            }
+
+            return method + " " + lsDuration + " " + psSql + lsParams;
         }
     }
 }
