@@ -25,7 +25,8 @@ namespace DotNetNuke.Entities.Portals
     using DotNetNuke.ComponentModel;
     using DotNetNuke.Data;
     using DotNetNuke.Entities.Content.Workflow;
-    using DotNetNuke.Entities.Modules;
+   using DotNetNuke.Entities.Controllers;
+   using DotNetNuke.Entities.Modules;
     using DotNetNuke.Entities.Portals.Internal;
     using DotNetNuke.Entities.Portals.Templates;
     using DotNetNuke.Entities.Profile;
@@ -383,9 +384,11 @@ namespace DotNetNuke.Entities.Portals
             var retValue = Null.NullString;
             try
             {
+                string hostsetting = HostController.Instance.GetString(settingName, defaultValue);
+
                 string setting;
                 Instance.GetPortalSettings(portalID).TryGetValue(settingName, out setting);
-                retValue = string.IsNullOrEmpty(setting) ? defaultValue : setting;
+                retValue = string.IsNullOrEmpty(setting) ? hostsetting : setting;
             }
             catch (Exception exc)
             {
