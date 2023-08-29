@@ -1395,7 +1395,7 @@ namespace DotNetNuke.Entities.Tabs
 
                     // if tab is not null means that the cache doesn't update correctly, we need clear the cache
                     // and let it rebuild cache when request next time.
-                    if (tab != null)
+                    if (tab != null && portalId == tab.PortalID)
                     {
                         this.ClearCache(tab.PortalID);
                     }
