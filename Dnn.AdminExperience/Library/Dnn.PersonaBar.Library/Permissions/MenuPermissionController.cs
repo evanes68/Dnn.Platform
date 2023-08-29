@@ -144,7 +144,6 @@ namespace Dnn.PersonaBar.Library.Permissions
                 permissionInfo.AllowAccess,
                 user.UserID);
 
-            ClearCache(portalId);
         }
 
         public static IList<PermissionInfo> GetPermissions(int menuId)
@@ -308,6 +307,8 @@ namespace Dnn.PersonaBar.Library.Permissions
 
                         SaveMenuPermissions(portalId, menuItem, menuPermissionInfo);
                     }
+
+                    ClearCache(portalId);
                 }
             }
             catch (Exception ex)
@@ -316,7 +317,7 @@ namespace Dnn.PersonaBar.Library.Permissions
             }
         }
 
-        private static void ClearCache(int portalId)
+        public static void ClearCache(int portalId)
         {
             if (portalId > Null.NullInteger)
             {

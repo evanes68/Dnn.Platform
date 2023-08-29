@@ -112,6 +112,8 @@ namespace Dnn.PersonaBar.UI.Components
                 {
                     menuItems.ForEach(i => this.SaveEditPermission(portalId, i));
                 }
+
+                MenuPermissionController.ClearCache(portalId);
             }
         }
 
@@ -146,6 +148,7 @@ namespace Dnn.PersonaBar.UI.Components
                     }
                 }
             });
+
         }
 
         private void RemovePersonaBarOldAssemblies()
