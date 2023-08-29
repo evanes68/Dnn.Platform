@@ -120,7 +120,7 @@ namespace DotNetNuke.Entities.Urls
                 if (HttpContext.Current?.Items["UrlRewrite:OriginalUrl"] != null)
                 {
                     string originalUrl =
-                        HttpContext.Current.Items["UrlRewrite:OriginalUrl"].ToString().ToLowerInvariant();
+                        HttpContext.Current.Items["UrlRewrite:OriginalUrl"].ToString().ToLowerInvariant().Replace("https:", "").Replace("http:", "");
                     httpAlias = Globals.AddPort(httpAlias, originalUrl);
                     if (originalUrl.StartsWith(httpAlias))
                     {
@@ -182,10 +182,11 @@ namespace DotNetNuke.Entities.Urls
                 friendlyPath = Globals.ResolveUrl(friendlyPath);
             }
 
-            if (friendlyPath.StartsWith("//") && isPagePath)
-            {
-                friendlyPath = friendlyPath.Substring(1);
-            }
+            // Evert, we hebben het protocol http:  weg gehaald. dan is // een goede start van de url!
+            //if (friendlyPath.StartsWith("//") && isPagePath)
+            //{
+            //    friendlyPath = friendlyPath.Substring(1);
+            //}
 
             return friendlyPath;
         }

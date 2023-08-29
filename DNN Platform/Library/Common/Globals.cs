@@ -923,12 +923,19 @@ namespace DotNetNuke.Common
         /// <returns>url with port if the post number is not 80.</returns>
         public static string AddPort(string httpAlias, string originalUrl)
         {
+            if (originalUrl.StartsWith("//")) { originalUrl = "https:" + originalUrl; };
+            if (httpAlias.StartsWith("//")) { httpAlias = "https:" + httpAlias; };
+
             var uri = new Uri(originalUrl);
             var aliasUri = new Uri(httpAlias);
 
             if (!uri.IsDefaultPort)
             {
                 httpAlias = AddHTTP(aliasUri.Host + ":" + uri.Port + aliasUri.LocalPath);
+            }
+            else
+            {
+                httpAlias = httpAlias.Replace("https:", string.Empty);
             }
 
             return httpAlias;
@@ -2137,9 +2144,10 @@ namespace DotNetNuke.Common
         {
             if (!string.IsNullOrEmpty(strURL))
             {
-                if (strURL.IndexOf("mailto:") == -1 && strURL.IndexOf("://") == -1 && strURL.IndexOf("~") == -1 && strURL.IndexOf("\\\\") == -1)
+                if (strURL.IndexOf("mailto:") == -1 && strURL.IndexOf("://") == -1 && strURL.IndexOf("~") == -1 && strURL.IndexOf("\\\\") == -1 && strURL.IndexOf("//") != 0)
                 {
-                    strURL = ((HttpContext.Current != null && UrlUtils.IsSecureConnectionOrSslOffload(HttpContext.Current.Request)) ? "https://" : "http://") + strURL;
+                    strURL = "//" + strURL;
+                    //strURL = ((HttpContext.Current != null && UrlUtils.IsSecureConnectionOrSslOffload(HttpContext.Current.Request)) ? "https://" : "http://") + strURL;
                 }
             }
 
