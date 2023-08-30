@@ -214,7 +214,7 @@ namespace DotNetNuke.Entities.Portals
             portalSettings.SSLEnforced = settings.GetValueOrDefault("SSLEnforced", false);
             portalSettings.SSLURL = settings.GetValueOrDefault("SSLURL", Null.NullString);
             portalSettings.STDURL = settings.GetValueOrDefault("STDURL", Null.NullString);
-            portalSettings.EnableRegisterNotification = settings.GetValueOrDefault("EnableRegisterNotification", true);
+            portalSettings.EnableRegisterNotification = settings.GetValueOrDefault("EnableRegisterNotification", HostController.Instance.GetBoolean("EnableRegisterNotification", true));
             portalSettings.DefaultAuthProvider = settings.GetValueOrDefault("DefaultAuthProvider", "DNN");
             portalSettings.SMTPConnectionLimit = settings.GetValueOrDefault("SMTPConnectionLimit", 2);
             portalSettings.SMTPMaxIdleTime = settings.GetValueOrDefault("SMTPMaxIdleTime", 100000);
