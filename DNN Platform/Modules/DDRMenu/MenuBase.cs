@@ -216,13 +216,16 @@ namespace DotNetNuke.Web.DDRMenu
                         this.RootNode.Children.FindAll(
                             n =>
                             {
-                                var tab = TabController.Instance.GetTab(n.TabId, Null.NullInteger, false);
-                                foreach (TabPermissionInfo perm in tab.TabPermissions)
+                                if (n.TabId > 0)
                                 {
-                                    if (perm.AllowAccess && (perm.PermissionKey == "VIEW") &&
-                                        ((perm.RoleID == -1) || (perm.RoleName.ToLowerInvariant() == roleName)))
+                                    var tab = TabController.Instance.GetTab(n.TabId, Null.NullInteger, false);
+                                    foreach (TabPermissionInfo perm in tab.TabPermissions)
                                     {
-                                        return true;
+                                        if (perm.AllowAccess && (perm.PermissionKey == "VIEW") &&
+                                            ((perm.RoleID == -1) || (perm.RoleName.ToLowerInvariant() == roleName)))
+                                        {
+                                            return true;
+                                        }
                                     }
                                 }
 
@@ -279,7 +282,12 @@ namespace DotNetNuke.Web.DDRMenu
                 parentNode.Children.FindAll(
                     n =>
                     {
-                        var tab = TabController.Instance.GetTab(n.TabId, portalSettings.PortalId);
+                        TabInfo tab = null;
+                        if (n.TabId > 0)
+                        {
+                            tab = TabController.Instance.GetTab(n.TabId, portalSettings.PortalId);
+                        }
+
                         return tab != null && !tab.IsVisible;
                     }));
 
