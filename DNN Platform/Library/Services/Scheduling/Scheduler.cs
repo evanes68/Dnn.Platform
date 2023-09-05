@@ -128,6 +128,12 @@ namespace DotNetNuke.Services.Scheduling
                 // Get the enabled servers with recent activity.
                 var enabledServers = ServerController.GetEnabledServersWithActivity();
 
+                // If no enabled servers with activity
+                if (enabledServers.Count == 0)
+                {
+                    return false;
+                }
+
                 // Validate that any server in the scheduled item is in the enabled server list with activity in the last 10 minutes.
                 bool serverHasRecentActivity = enabledServers.Any(i => servers.Contains(i.ServerName.ToLowerInvariant()));
 
