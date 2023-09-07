@@ -346,7 +346,7 @@ namespace Dnn.PersonaBar.SiteSettings.Services
                         RedirectAfterLogoutTabName = this.TabSanitizer(redirectAfterLogoutTabId, pid)?.TabName,
                         RedirectAfterRegistrationTabId = this.TabSanitizer(redirectAfterRegistrationTabId, pid)?.TabID,
                         RedirectAfterRegistrationTabName = this.TabSanitizer(redirectAfterRegistrationTabId, pid)?.TabName,
-                        PageHeadText = localizedPortalSettings["PageHeadText"],
+                        PageHeadText = PortalController.GetPortalSetting("PageHeadText", pid, string.Empty, cultureCode),
                     },
                 });
             }
