@@ -15,7 +15,8 @@ namespace DotNetNuke.Entities.Portals
     using DotNetNuke.Entities.Tabs;
     using DotNetNuke.Entities.Urls;
     using DotNetNuke.Entities.Users;
-    using DotNetNuke.Services.Log.EventLog;
+   using DotNetNuke.Instrumentation;
+   using DotNetNuke.Services.Log.EventLog;
 
     /// <summary>PortalAliasController provides method to manage portal alias.</summary>
     /// <remarks>
@@ -25,6 +26,8 @@ namespace DotNetNuke.Entities.Portals
     /// </remarks>
     public partial class PortalAliasController : IPortalAliasService
     {
+        private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalAliasController));
+
         private IPortalAliasService ThisAsInterface => this;
 
         /// <inheritdoc/>
@@ -115,9 +118,17 @@ namespace DotNetNuke.Entities.Portals
                 return ValidateAlias(portalAlias, true, false);
             }
 
-            // validate the domain
+            // validate the domain.
+
+            // Evert, door de aanpassing aan de AddHTTP zit er niet meer http aan het begin. Hier echter wel nodig!
+            string lsFullPortalAlias = Globals.AddHTTP(portalAlias);
+            if (lsFullPortalAlias.StartsWith("//", StringComparison.InvariantCultureIgnoreCase))
+            {
+                lsFullPortalAlias = "http:" + lsFullPortalAlias;
+            }
+
             Uri result;
-            if (Uri.TryCreate(Globals.AddHTTP(portalAlias), UriKind.Absolute, out result))
+            if (Uri.TryCreate(lsFullPortalAlias, UriKind.Absolute, out result))
             {
                 return ValidateAlias(result.Host, false, true) && ValidateAlias(portalAlias, false, false);
             }
@@ -265,10 +276,10 @@ namespace DotNetNuke.Entities.Portals
 
         private static bool ValidateAlias(string portalAlias, bool ischild, bool isDomain)
         {
-            string validChars = "abcdefghijklmnopqrstuvwxyz0123456789-/";
+            string validChars = "abcdefghijklmnopqrstuvwxyz0123456789-/:";
             if (!ischild)
             {
-                validChars += ".:";
+                validChars += ".";
             }
 
             if (!isDomain)
@@ -276,7 +287,10 @@ namespace DotNetNuke.Entities.Portals
                 validChars += "_";
             }
 
-            return portalAlias.All(c => validChars.Contains(c.ToString()));
+            bool lbValid = portalAlias.All(c => validChars.Contains(c.ToString()));
+            Logger.Debug($"ValidateAlias {portalAlias} is valid {lbValid}");
+
+            return lbValid;
         }
 
         private IPortalAliasInfo GetPortalAliasLookupInternal(string alias)

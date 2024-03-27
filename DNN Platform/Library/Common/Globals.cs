@@ -2146,6 +2146,7 @@ namespace DotNetNuke.Common
             {
                 if (strURL.IndexOf("mailto:") == -1 && strURL.IndexOf("://") == -1 && strURL.IndexOf("~") == -1 && strURL.IndexOf("\\\\") == -1 && strURL.IndexOf("//") != 0)
                 {
+                    //Evert: dit is omdat ik niet wil dat wij bepalen of het http of https is, dat is aan de reverse proxy.
                     strURL = "//" + strURL;
                     //strURL = ((HttpContext.Current != null && UrlUtils.IsSecureConnectionOrSslOffload(HttpContext.Current.Request)) ? "https://" : "http://") + strURL;
                 }
