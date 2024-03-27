@@ -626,6 +626,12 @@ namespace DotNetNuke.HttpModules.UrlRewrite
                             }
                         }
 
+                        // Evert: dit is denk ik foutief. Wat als CultureCode onbekend is? dan worden alle talen binnen gehaald en wordt er mogelijk een inactieve taal geselecteerd.
+                        if (string.IsNullOrEmpty(cultureCode))
+                        {
+                            cultureCode = LocaleController.Instance.GetDefaultLocale(portalID).Code;
+                        }
+
                         // Check to see if the tab exists (if localization is enable, check for the specified culture)
                         int tabID = TabController.GetTabByTabPath(
                             portalID,
