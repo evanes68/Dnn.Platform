@@ -301,7 +301,7 @@ namespace DotNetNuke.Data.PetaPoco
                 }
             }
 
-            return method + " " + lsDuration + " " + psSql + lsParams;
+            return method + " " + lsDuration + " " + psSql.Replace(System.Environment.NewLine, " ") + lsParams;
         }
     }
 }
