@@ -615,10 +615,11 @@ namespace DotNetNuke.Security.Permissions
 
         /// <summary>Returns a flag indicating whether the current user can see a page in a navigation object.</summary>
         /// <param name="tab">The page.</param>
+        /// <param name="isPageAdmin">To improve performance and prevent reloading tabs. Is the user the page admin.</param>
         /// <returns>A flag indicating whether the user has permission.</returns>
-        public virtual bool CanNavigateToPage(TabInfo tab)
+        public virtual bool CanNavigateToPage(TabInfo tab, bool isPageAdmin)
         {
-            return this.HasPagePermission(tab, NavigatePagePermissionKey) || this.HasPagePermission(tab, ViewPagePermissionKey) || this.IsPageAdmin(tab.PortalID);
+            return this.HasPagePermission(tab, NavigatePagePermissionKey) || this.HasPagePermission(tab, ViewPagePermissionKey) || isPageAdmin;
         }
 
         /// <summary>Returns a flag indicating whether the current user can view a page.</summary>

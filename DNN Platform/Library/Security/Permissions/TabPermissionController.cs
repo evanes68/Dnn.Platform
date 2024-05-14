@@ -157,7 +157,16 @@ namespace DotNetNuke.Security.Permissions
         /// <returns>A flag indicating whether the user has permission.</returns>
         public static bool CanNavigateToPage(TabInfo tab)
         {
-            return Provider.CanNavigateToPage(tab);
+            return Provider.CanNavigateToPage(tab, Provider.IsPageAdmin(tab.PortalID));
+        }
+
+        /// <summary>Returns a flag indicating whether the current user can see a page in a navigation object.</summary>
+        /// <param name="tab">The page.</param>
+        /// <param name="isPageAdmin">This overload can improve performce and prevent reload tabs collection from cache. Is current user page admin.</param>
+        /// <returns>A flag indicating whether the user has permission.</returns>
+        public static bool CanNavigateToPage(TabInfo tab, bool isPageAdmin)
+        {
+            return Provider.CanNavigateToPage(tab, isPageAdmin);
         }
 
         /// <summary>Returns a flag indicating whether the current user can view the current page.</summary>

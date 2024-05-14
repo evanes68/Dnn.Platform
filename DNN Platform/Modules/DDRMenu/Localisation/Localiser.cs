@@ -58,9 +58,9 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
 
         /// <summary>Localizes a single node.</summary>
         /// <param name="node">The node to localize.</param>
-        public void LocaliseNode(MenuNode node)
+        public void LocaliseNode(MenuNode node, TabCollection objPortalTabs)
         {
-            var tab = (node.TabId > 0) ? TabController.Instance.GetTab(node.TabId, Null.NullInteger, false) : null;
+            var tab = (node.TabId > 0) ? TabController.Instance.GetTab(node.TabId, this.portalId, false, objPortalTabs) : null;
             if (tab != null)
             {
                 var localised = this.LocaliseTab(tab);
@@ -86,7 +86,7 @@ namespace DotNetNuke.Web.DDRMenu.Localisation
                 node.TabId = -1;
             }
 
-            node.Children.ForEach(this.LocaliseNode);
+            node.Children.ForEach(n => this.LocaliseNode(n, objPortalTabs));
         }
 
         private TabInfo LocaliseTab(TabInfo tab)

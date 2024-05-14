@@ -112,11 +112,14 @@ namespace DotNetNuke.Web.DDRMenu
                 this.FilterNodes(this.menuSettings.ExcludeNodes, true);
             }
 
+            TabCollection loPortalTabs = null;
             if (string.IsNullOrEmpty(this.menuSettings.NodeXmlPath) && !this.SkipLocalisation)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
+                loPortalTabs = TabController.Instance.GetTabsByPortal(this.HostPortalSettings.PortalId);
+
                 // TODO: In Dnn v11, replace this to use IPortalSettings private field instantiate in constructor
-                new Localiser(this.HostPortalSettings.PortalId).LocaliseNode(this.RootNode);
+                new Localiser(this.HostPortalSettings.PortalId).LocaliseNode(this.RootNode, loPortalTabs);
 #pragma warning restore CS0618 // Type or member is obsolete
             }
 
@@ -127,7 +130,14 @@ namespace DotNetNuke.Web.DDRMenu
 
             if (!this.menuSettings.IncludeHidden)
             {
-                this.FilterHiddenNodes(this.RootNode);
+                if (loPortalTabs == null)
+                {
+#pragma warning disable CS0618 // Type or member is obsolete
+                    loPortalTabs = TabController.Instance.GetTabsByPortal(this.HostPortalSettings.PortalId);
+#pragma warning restore CS0618 // Type or member is obsolete
+                }
+
+                this.FilterHiddenNodes(this.RootNode, loPortalTabs);
             }
 
             var imagePathOption =
@@ -274,7 +284,7 @@ namespace DotNetNuke.Web.DDRMenu
             }
         }
 
-        private void FilterHiddenNodes(MenuNode parentNode)
+        private void FilterHiddenNodes(MenuNode parentNode, TabCollection objPortalTabs)
         {
             var portalSettings = PortalController.Instance.GetCurrentSettings();
             var filteredNodes = new List<MenuNode>();
@@ -285,7 +295,7 @@ namespace DotNetNuke.Web.DDRMenu
                         TabInfo tab = null;
                         if (n.TabId > 0)
                         {
-                            tab = TabController.Instance.GetTab(n.TabId, portalSettings.PortalId);
+                            tab = TabController.Instance.GetTab(n.TabId, portalSettings.PortalId, false, portalTabs: objPortalTabs);
                         }
 
                         return tab != null && !tab.IsVisible;
@@ -293,7 +303,7 @@ namespace DotNetNuke.Web.DDRMenu
 
             parentNode.Children.RemoveAll(n => filteredNodes.Contains(n));
 
-            parentNode.Children.ForEach(this.FilterHiddenNodes);
+            parentNode.Children.ForEach(n => this.FilterHiddenNodes(n, objPortalTabs));
         }
 
         private void ApplyNodeSelector()

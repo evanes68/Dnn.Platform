@@ -150,6 +150,14 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>tab info.</returns>
         TabInfo GetTab(int tabId, int portalId, bool ignoreCache);
 
+        /// <summary>Gets the tab.</summary>
+        /// <param name="tabId">The tab id.</param>
+        /// <param name="portalId">The portal id.</param>
+        /// <param name="ignoreCache">if set to <c>true</c> will get tab info directly from database.</param>
+        /// <param name="portalTabs">This is all the tabs for a portal, it helps avoid frequent caching requests.</param>
+        /// <returns>tab info.</returns>
+        TabInfo GetTab(int tabId, int portalId, bool ignoreCache, TabCollection portalTabs);
+
         /// <summary>Gets the tab by culture.</summary>
         /// <param name="tabId">The tab id.</param>
         /// <param name="portalId">The portal id.</param>

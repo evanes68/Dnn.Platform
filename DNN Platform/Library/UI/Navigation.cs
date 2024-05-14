@@ -50,7 +50,7 @@ namespace DotNetNuke.UI
                     (!tab.DisableLink || showDisabled) &&
                     (((tab.StartDate < DateTime.Now || tab.StartDate == Null.NullDate) &&
                       (tab.EndDate > DateTime.Now || tab.EndDate == Null.NullDate)) || isAdminMode) &&
-                    TabPermissionController.CanNavigateToPage(tab);
+                    TabPermissionController.CanNavigateToPage(tab, isAdminMode);
         }
 
         /// <summary>Allows for DNNNode object to be easily obtained based off of passed in ID.</summary>
@@ -224,14 +224,16 @@ namespace DotNetNuke.UI
             var nodesDict = new Dictionary<string, DNNNode>();
             SaveDnnNodesToDictionary(nodesDict, objRootNodes);
 
+            bool lbCanAdminPage = TabPermissionController.CanAdminPage();
+
             foreach (var objTab in cachedPortalTabs)
             {
-                ProcessTab(objRootNode, objTab, objTabLookup, objBreadCrumbs, intLastBreadCrumbId, eToolTips, intStartTabId, intDepth, intNavNodeOptions, nodesDict);
+                ProcessTab(objRootNode, objTab, objTabLookup, objBreadCrumbs, intLastBreadCrumbId, eToolTips, intStartTabId, intDepth, intNavNodeOptions, nodesDict, lbCanAdminPage, objPortalSettings);
             }
 
             foreach (var objTab in cachedHostTabs)
             {
-                ProcessTab(objRootNode, objTab, objTabLookup, objBreadCrumbs, intLastBreadCrumbId, eToolTips, intStartTabId, intDepth, intNavNodeOptions, nodesDict);
+                ProcessTab(objRootNode, objTab, objTabLookup, objBreadCrumbs, intLastBreadCrumbId, eToolTips, intStartTabId, intDepth, intNavNodeOptions, nodesDict, lbCanAdminPage, objPortalSettings);
             }
 
             return objRootNodes;
@@ -481,13 +483,12 @@ namespace DotNetNuke.UI
             return objTab.ParentId == ((TabInfo)objTabLookup[intStartTabId]).ParentId;
         }
 
-        private static void ProcessTab(DNNNode objRootNode, TabInfo objTab, Hashtable objTabLookup, Hashtable objBreadCrumbs, int intLastBreadCrumbId, ToolTipSource eToolTips, int intStartTabId, int intDepth, int intNavNodeOptions, IDictionary<string, DNNNode> nodesLookup)
+        private static void ProcessTab(DNNNode objRootNode, TabInfo objTab, Hashtable objTabLookup, Hashtable objBreadCrumbs, int intLastBreadCrumbId, ToolTipSource eToolTips, int intStartTabId, int intDepth, int intNavNodeOptions, IDictionary<string, DNNNode> nodesLookup, bool boolCanAdminPage, PortalSettings objPortalSettings)
         {
-            PortalSettings objPortalSettings = PortalController.Instance.GetCurrentPortalSettings();
             bool showHidden = (intNavNodeOptions & (int)NavNodeOptions.IncludeHiddenNodes) == (int)NavNodeOptions.IncludeHiddenNodes;
 
             // based off of tab properties, is it shown
-            if (CanShowTab(objTab, TabPermissionController.CanAdminPage(), true, showHidden))
+            if (CanShowTab(objTab, boolCanAdminPage, true, showHidden))
             {
                 DNNNodeCollection objParentNodes;
                 DNNNode objParentNode;
