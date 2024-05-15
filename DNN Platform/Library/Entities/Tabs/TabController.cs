@@ -1367,7 +1367,7 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>tab info.</returns>
         public TabInfo GetTab(int tabId, int portalId, bool ignoreCache)
         {
-            return this.GetTab(tabId, portalId, ignoreCache, null);
+            return this.GetTab(tabId, portalId, ignoreCache, null, null);
         }
 
         /// <summary>Gets the tab.</summary>
@@ -1376,7 +1376,7 @@ namespace DotNetNuke.Entities.Tabs
         /// <param name="ignoreCache">if set to <c>true</c> will get tab info directly from database.</param>
         /// <param name="portalTabs">This is all the tabs for a portal, it helps avoid frequent caching requests.</param>
         /// <returns>tab info.</returns>
-        public TabInfo GetTab(int tabId, int portalId, bool ignoreCache, TabCollection portalTabs)
+        public TabInfo GetTab(int tabId, int portalId, bool ignoreCache, TabCollection portalTabs, TabCollection hostTabs)
         {
             TabInfo tab = null;
 
@@ -1401,6 +1401,16 @@ namespace DotNetNuke.Entities.Tabs
 
                 // if we have the PortalId then try to get the TabInfo object
                 tab = portalTabs.WithTabId(tabId);
+
+                if (tab == null)
+                {
+                    if (hostTabs == null)
+                    {
+                        hostTabs = this.GetTabsByPortal(Null.NullInteger);
+                    }
+
+                    tab = hostTabs.WithTabId(tabId);
+                }
 
                 if (tab == null)
                 {
