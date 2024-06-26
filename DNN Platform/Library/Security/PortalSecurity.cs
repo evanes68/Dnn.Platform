@@ -77,7 +77,7 @@ namespace DotNetNuke.Security
             new Regex("\bonfinish\b", RxOptions),
             new Regex("javascript:", RxOptions),
             new Regex("vbscript:", RxOptions),
-            new Regex("unescape", RxOptions),
+            new Regex("unescape\\s*\\(", RxOptions),
             new Regex("alert[\\s(&nbsp;)]*\\([\\s(&nbsp;)]*'?[\\s(&nbsp;)]*[\"(&quot;)]?", RxOptions),
             new Regex(@"eval*.\(", RxOptions),
         };
