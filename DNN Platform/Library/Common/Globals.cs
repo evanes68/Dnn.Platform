@@ -2965,7 +2965,7 @@ namespace DotNetNuke.Common
                 }
 
                 // only add language to url if more than one locale is enabled, and if admin did not turn it off
-                if (LocaleController.Instance.GetLocales(portalId).Count > 1 && enableUrlLanguage)
+                if (LocaleController.Instance.GetPublishedLocales(portalId).Count > 1 && enableUrlLanguage)
                 {
                     strLink += "&language=" + Thread.CurrentThread.CurrentCulture.Name;
                 }
@@ -3468,7 +3468,7 @@ namespace DotNetNuke.Common
         /// <param name="tabId">The tab ID.</param>
         /// <param name="isSuperTab">if set to <c>true</c> [is super tab].</param>
         /// <param name="settings">The settings.</param>
-        /// <returns>return the tab's culture code, if ths tab doesn't exist, it will return current culture name.</returns>
+        /// <returns>return the tab's culture code, if ths tab doesn't exist, it will return default portal culture name.</returns>
         internal static string GetCultureCode(int tabId, bool isSuperTab, IPortalSettings settings)
         {
             string cultureCode = Null.NullString;
@@ -3482,7 +3482,7 @@ namespace DotNetNuke.Common
 
                 if (string.IsNullOrEmpty(cultureCode))
                 {
-                    cultureCode = Thread.CurrentThread.CurrentCulture.Name;
+                    cultureCode = settings.DefaultLanguage;
                 }
             }
 

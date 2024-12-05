@@ -3,8 +3,8 @@
 // See the LICENSE file in the project root for more information
 namespace DotNetNuke.Common
 {
-    using System.Linq;
-    using System.Threading;
+   using System.Linq;
+   using System.Threading;
 
     using DotNetNuke.Abstractions;
     using DotNetNuke.Abstractions.Portals;
@@ -165,8 +165,8 @@ namespace DotNetNuke.Common
                 tab = TabController.Instance.GetTab(tabID, isSuperTab ? Null.NullInteger : settings.PortalId, false);
             }
 
-            // only add language to url if more than one locale is enabled
-            if (settings != null && language != null && LocaleController.Instance.GetLocales(settings.PortalId).Count > 1)
+            // only add language to url if more than one locale is enabled and locale is published
+            if (settings != null && language != null && LocaleController.Instance.GetPublishedLocales(settings.PortalId).Count > 1)
             {
                 if (settings.ContentLocalizationEnabled)
                 {
@@ -187,7 +187,7 @@ namespace DotNetNuke.Common
                     // legacy pre 5.5 behavior
                     if (language == string.Empty)
                     {
-                        url += "&language=" + Thread.CurrentThread.CurrentCulture.Name;
+                        url += "&language=" + settings.DefaultLanguage;
                     }
                     else
                     {

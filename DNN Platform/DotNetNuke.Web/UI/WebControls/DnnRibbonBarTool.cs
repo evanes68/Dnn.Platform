@@ -575,7 +575,7 @@ namespace DotNetNuke.Web.UI.WebControls
                     }
                 }
 
-                string currentCulture = Thread.CurrentThread.CurrentCulture.Name;
+                string currentCulture = PortalSettings.DefaultLanguage;
                 strURL = this.NavigationManager.NavigateURL(moduleInfo.TabID, isHostPage, PortalSettings, this.ToolInfo.ControlKey, currentCulture, additionalParams.ToArray());
             }
 
