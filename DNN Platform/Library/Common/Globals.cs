@@ -3482,7 +3482,14 @@ namespace DotNetNuke.Common
 
                 if (string.IsNullOrEmpty(cultureCode))
                 {
-                    cultureCode = settings.DefaultLanguage;
+                    if (LocaleController.Instance.GetPublishedLocales(settings.PortalId).ContainsKey(Thread.CurrentThread.CurrentCulture.Name))
+                    {
+                        cultureCode = Thread.CurrentThread.CurrentCulture.Name;
+                    }
+                    else
+                    {
+                        cultureCode = settings.DefaultLanguage;
+                    }
                 }
             }
 
