@@ -645,6 +645,16 @@ namespace DotNetNuke.HttpModules.UrlRewrite
                                 portalID,
                                 tabPath.Replace("/", "//").Replace(".aspx", string.Empty),
                                 string.Empty);
+
+                            // When still not found please check redirect urls
+                            if (tabID == Null.NullInteger)
+                            {
+                                tabID = TabController.GetTabUrlByTabPath(portalID, tabPath, cultureCode);
+                                if (tabID == Null.NullInteger)
+                                {
+                                    tabID = TabController.GetTabUrlByTabPath(portalID, tabPath, string.Empty);
+                                }
+                            }
                         }
 
                         // End of patch

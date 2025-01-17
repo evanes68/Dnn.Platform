@@ -222,6 +222,8 @@ namespace DotNetNuke.Entities.Tabs
         /// <returns>list of urls associated with a tab.</returns>
         List<TabUrlInfo> GetTabUrls(int tabId, int portalId);
 
+        List<TabUrlInfo> GetPortalTabUrls(int portalId);
+
         /// <summary>Gives the translator role edit rights.</summary>
         /// <param name="localizedTab">The localized tab.</param>
         /// <param name="users">The users.</param>

@@ -567,6 +567,26 @@ namespace DotNetNuke.Entities.Tabs
             return -1;
         }
 
+        /// <summary>Gets the tab by tab path.</summary>
+        /// <param name="portalId">The portal id.</param>
+        /// <param name="tabPath">The tab path.</param>
+        /// <param name="cultureCode">The culture code.</param>
+        /// <returns>The tab ID or <c>-1</c>.</returns>
+        public static int GetTabUrlByTabPath(int portalId, string tabPath, string cultureCode)
+        {
+            // Get the Portal TabUrl Dictionary
+            List<TabUrlInfo> dicTabUrls = TabController.Instance.GetPortalTabUrls(portalId);
+
+            TabUrlInfo loTab = dicTabUrls.Select(tabUrl => tabUrl).FirstOrDefault(tabUrl => tabUrl.Url == tabPath && tabUrl.CultureCode == cultureCode);
+            
+            if (loTab != null)
+            {
+                return loTab.TabId;
+            }
+
+            return -1;
+        }
+
         /// <summary>Gets the tab path dictionary.</summary>
         /// <param name="portalId">The portal id.</param>
         /// <param name="cultureCode">The culture code.</param>
@@ -1611,6 +1631,26 @@ namespace DotNetNuke.Entities.Tabs
 
             return tabRedirects;
         }
+
+        /// <summary>Get the list of url's associated with a portal.</summary>
+        /// <param name="portalId">the portal id.</param>
+        /// <returns>list of urls associated with portal.</returns>
+        public List<TabUrlInfo> GetPortalTabUrls(int portalId)
+        {
+            // Get the Portal TabUrl Dictionary
+            Dictionary<int, List<TabUrlInfo>> dicTabUrls = this.GetTabUrls(portalId);
+
+            // Get the Collection from the Dictionary
+            List<TabUrlInfo> tabRedirects = new List<TabUrlInfo>();
+
+            foreach (var tabUrls in dicTabUrls.Values)
+            {
+                tabRedirects.AddRange(tabUrls);
+            }
+
+            return tabRedirects;
+        }
+
 
         /// <summary>Gives the translator role edit rights.</summary>
         /// <param name="localizedTab">The localized tab.</param>
