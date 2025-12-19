@@ -205,6 +205,7 @@ namespace DotNetNuke.Services.Cache
         /// <param name="clearRuntime">if set to <c>true</c> clear runtime cache.</param>
         protected void ClearCacheInternal(string cacheType, string data, bool clearRuntime)
         {
+            Logger.Info($"dnn ClearCacheInternal {cacheType} {data}");
             switch (cacheType)
             {
                 case "Prefix":
@@ -232,7 +233,11 @@ namespace DotNetNuke.Services.Cache
                     this.ClearTabCacheInternal(int.Parse(data), clearRuntime);
                     break;
                 case "ServiceFrameworkRoutes":
-                    this.ReloadServicesFrameworkRoutes();
+                    // Evert, we zetten dit uit. Bij het aanmaken van een nieuw portaal wordt na elke alias aanmaken deze routine aangeroepen.
+                    // nu zorgt dit er voor dat api calls naar dnn omgeving dan mislukken met een 404 error. Zonder de call naar ReloadServicesFrameworkRoutes 
+                    // werken de nieuwe aliassen ook gewoon. Dan maar even uit.
+
+                    // this.ReloadServicesFrameworkRoutes();
                     break;
             }
         }
