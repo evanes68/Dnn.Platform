@@ -3444,15 +3444,16 @@ namespace Dnn.PersonaBar.SiteSettings.Services
 
         private TabInfo TabSanitizer(int tabId, int portalId)
         {
-            var tab = TabController.Instance.GetTab(tabId, portalId);
-            if (tab != null && !tab.IsDeleted)
+            if (tabId > 0)
             {
-                return tab;
+                var tab = TabController.Instance.GetTab(tabId, portalId);
+                if (tab != null && !tab.IsDeleted)
+                {
+                    return tab;
+                }
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         private int ValidateTabId(int tabId, int portalId)
