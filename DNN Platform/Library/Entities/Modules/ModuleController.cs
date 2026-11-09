@@ -41,8 +41,11 @@ namespace DotNetNuke.Entities.Modules
     /// <summary>ModuleController provides the Business Layer for Modules.</summary>
     public partial class ModuleController : ServiceLocator<IModuleController, ModuleController>, IModuleController
     {
+        private const string TabModulesLoadCountKey = "DnnDiag_TabModulesLoadCount";
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(ModuleController));
+        private static readonly ILog TabModulesLoadLogger = LoggerSource.Instance.GetLogger("DotNetNuke.Diagnostics.TabModulesLoad");
         private static readonly DataProvider DataProvider = DataProvider.Instance();
+        private static int tabModulesLoadsWithoutContext;
 
         private static Hashtable ParsedLocalizedModuleGuid
         {
@@ -2549,8 +2552,104 @@ namespace DotNetNuke.Entities.Modules
             }
         }
 
+        /// <summary>
+        /// Diagnostics (temporary): logs who loads the modules of many tabs within one request, i.e. a loop over tabs
+        /// that causes a database call per tab on a cold cache. Enable the logger "DotNetNuke.Diagnostics.TabModulesLoad"
+        /// at DEBUG level in DotNetNuke.log4net.config. Only the 25th and 200th miss of a request are logged, with a short
+        /// stack trace, so the log stays small.
+        /// </summary>
+        /// <param name="tabId">The tab whose modules are being loaded from the database.</param>
+        private void LogTabModulesLoad(int tabId)
+        {
+            if (!TabModulesLoadLogger.IsDebugEnabled)
+            {
+                return;
+            }
+
+            var context = HttpContext.Current;
+            int count;
+            if (context != null)
+            {
+                count = (context.Items[TabModulesLoadCountKey] as int? ?? 0) + 1;
+                context.Items[TabModulesLoadCountKey] = count;
+            }
+            else
+            {
+                // Background thread (scheduler etc.): no request scope, sample globally instead.
+                count = Interlocked.Increment(ref tabModulesLoadsWithoutContext);
+                if (count % 500 != 0)
+                {
+                    return;
+                }
+            }
+
+            if (context != null && count != 25 && count != 200)
+            {
+                return;
+            }
+
+            string url;
+            try
+            {
+                url = context?.Request.RawUrl ?? "(no request)";
+            }
+            catch (HttpException)
+            {
+                url = "(request not available)";
+            }
+
+            TabModulesLoadLogger.DebugFormat(
+                "GetTabModules cache miss #{0} in one request, tabId {1}, url {2}, stack: {3}",
+                count,
+                tabId,
+                url,
+                this.ShortStackTrace());
+        }
+
+        private string ShortStackTrace()
+        {
+            var frames = new System.Diagnostics.StackTrace(2, false).GetFrames();
+            if (frames == null)
+            {
+                return string.Empty;
+            }
+
+            var parts = new List<string>();
+            foreach (var frame in frames)
+            {
+                var method = frame.GetMethod();
+                var type = method?.DeclaringType;
+                if (type == null)
+                {
+                    continue;
+                }
+
+                var typeName = type.FullName ?? type.Name;
+
+                // Skip cache plumbing and framework frames; keep the callers.
+                if (typeName.StartsWith("System.", StringComparison.Ordinal) ||
+                    typeName.StartsWith("Microsoft.", StringComparison.Ordinal) ||
+                    typeName.StartsWith("DotNetNuke.Common.Utilities.CBO", StringComparison.Ordinal) ||
+                    typeName.StartsWith("DotNetNuke.Common.Utilities.DataCache", StringComparison.Ordinal) ||
+                    (typeName.StartsWith("ASP.", StringComparison.Ordinal) && method.Name.StartsWith("__", StringComparison.Ordinal)))
+                {
+                    continue;
+                }
+
+                parts.Add(typeName + "." + method.Name);
+                if (parts.Count >= 20)
+                {
+                    break;
+                }
+            }
+
+            return string.Join(" <- ", parts);
+        }
+
         private Dictionary<int, ModuleInfo> GetModulesCurrentPage(int tabId)
         {
+            this.LogTabModulesLoad(tabId);
+
             var modules = CBO.FillCollection<ModuleInfo>(DataProvider.Instance().GetTabModules(tabId));
 
             var dictionary = new Dictionary<int, ModuleInfo>();
