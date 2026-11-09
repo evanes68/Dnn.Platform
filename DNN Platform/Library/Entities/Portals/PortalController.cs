@@ -62,6 +62,9 @@ namespace DotNetNuke.Entities.Portals
     {
         protected const string HttpContextKeyPortalSettingsDictionary = "PortalSettingsDictionary{0}{1}";
 
+        private const string EnsureLocalizationWarnedCacheKey = "EnsureLocalizationWarned_{0}_{1}";
+        private const int EnsureLocalizationWarnIntervalMinutes = 10;
+
         private static readonly ILog Logger = LoggerSource.Instance.GetLogger(typeof(PortalController));
 
         /// <summary>Adds the portal dictionary.</summary>
@@ -1085,9 +1088,7 @@ namespace DotNetNuke.Entities.Portals
                     // if we cannot find any fallback, it mean's it's a non portal default langauge
                     if (portal == null)
                     {
-                        DataProvider.Instance().EnsureLocalizationExists(portalId, GetActivePortalLanguage(portalId));
-                        DataCache.ClearHostCache(true);
-                        portal = GetPortalInternal(portalId, GetActivePortalLanguage(portalId));
+                        portal = EnsurePortalLocalization(portalId, cultureCode, fallbackLanguage);
                     }
                 }
             }
@@ -1676,6 +1677,52 @@ namespace DotNetNuke.Entities.Portals
         private static PortalInfo GetPortalInternal(int portalId, string cultureCode)
         {
             return Instance.GetPortalList(cultureCode).SingleOrDefault(p => p.PortalID == portalId);
+        }
+
+        /// <summary>
+        /// Creates the missing portal localization for the active portal language and returns the portal in that language.
+        /// </summary>
+        /// <remarks>
+        /// Originally this called <see cref="DataCache.ClearHostCache"/> with cascade, which flushed the complete cache on every
+        /// webserver (the caching provider forwards the clear) each time such a portal was requested. Only the cached portal
+        /// list of the language and the cache of this portal can have changed, so only those are removed now.
+        /// This typically happens while a portal is being created: the new portal is not yet in the cached portal list, so
+        /// every request in that phase used to flush everything (13-16 full clears per new portal in production).
+        /// Every miss still retries, because during portal creation the localization can exist a moment later; only the
+        /// warning is limited to once per interval.
+        /// </remarks>
+        private static PortalInfo EnsurePortalLocalization(int portalId, string cultureCode, string fallbackLanguage)
+        {
+            var activeLanguage = GetActivePortalLanguage(portalId);
+
+            DataProvider.Instance().EnsureLocalizationExists(portalId, activeLanguage);
+            RemoveCachedPortalList(activeLanguage);
+            DataCache.ClearPortalCache(portalId, false);
+
+            var portal = GetPortalInternal(portalId, activeLanguage);
+            if (portal == null)
+            {
+                var warnedKey = string.Format(EnsureLocalizationWarnedCacheKey, portalId, activeLanguage);
+                if (DataCache.GetCache(warnedKey) == null)
+                {
+                    Logger.WarnFormat(
+                        "Portal {0} has no localization for culture '{1}', fallback '{2}' or active language '{3}', and it could not be created. Check PortalLocalization and PortalLanguages for this portal.",
+                        portalId,
+                        cultureCode,
+                        fallbackLanguage,
+                        activeLanguage);
+
+                    // Absolute expiration: a sliding one would never expire while the portal keeps being requested.
+                    DataCache.SetCache(warnedKey, true, DateTime.Now.AddMinutes(EnsureLocalizationWarnIntervalMinutes));
+                }
+            }
+
+            return portal;
+        }
+
+        private static void RemoveCachedPortalList(string cultureCode)
+        {
+            DataCache.RemoveCache(string.Format(DataCache.PortalCacheKey, Null.NullInteger, cultureCode));
         }
 
         private static object GetPortalDefaultLanguageCallBack(CacheItemArgs cacheItemArgs)
