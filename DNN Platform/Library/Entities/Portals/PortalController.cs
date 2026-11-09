@@ -62,6 +62,7 @@ namespace DotNetNuke.Entities.Portals
     {
         protected const string HttpContextKeyPortalSettingsDictionary = "PortalSettingsDictionary{0}{1}";
 
+        private const string PortalDefaultLanguageCacheKey = "PortalDefaultLanguage_{0}";
         private const string EnsureLocalizationWarnedCacheKey = "EnsureLocalizationWarned_{0}_{1}";
         private const int EnsureLocalizationWarnIntervalMinutes = 10;
 
@@ -754,7 +755,7 @@ namespace DotNetNuke.Entities.Portals
         /// <returns>The language identifier.</returns>
         public static string GetPortalDefaultLanguage(int portalID)
         {
-            string cacheKey = string.Format("PortalDefaultLanguage_{0}", portalID);
+            string cacheKey = string.Format(PortalDefaultLanguageCacheKey, portalID);
             return CBO.GetCachedObject<string>(new CacheItemArgs(cacheKey, DataCache.PortalCacheTimeOut, DataCache.PortalCachePriority, portalID), GetPortalDefaultLanguageCallBack);
         }
 
@@ -2346,8 +2347,30 @@ namespace DotNetNuke.Entities.Portals
             // clear portal cache
             if (clearCache)
             {
-                DataCache.ClearHostCache(true);
+                ClearUpdatedPortalCache(portal.PortalID);
             }
+        }
+
+        /// <summary>
+        /// Clears the caches that can change when the record of a portal is updated.
+        /// </summary>
+        /// <remarks>
+        /// This used to be <see cref="DataCache.ClearHostCache"/> with cascade, which flushed the complete cache on every
+        /// webserver (the caching provider forwards the clear) each time portal settings were saved, and several times
+        /// while a portal is being created. A portal update only affects the cached portal lists, the cache of this
+        /// portal (portal settings per culture), its default language, the portal groups and its folders.
+        /// </remarks>
+        /// <param name="portalId">The updated portal.</param>
+        private static void ClearUpdatedPortalCache(int portalId)
+        {
+            // The cached lists of all portals ("Portal-1_{culture}"), one per requested culture code in any casing.
+            DataCache.ClearCache(string.Format(DataCache.PortalCacheKey, Null.NullInteger, string.Empty));
+            DataCache.RemoveCache(string.Format(PortalDefaultLanguageCacheKey, portalId));
+            DataCache.RemoveCache(DataCache.PortalGroupsCacheKey);
+            DataCache.ClearPortalCache(portalId, false);
+
+            // The home directory may have changed.
+            DataCache.ClearFolderCache(portalId);
         }
 
         [Obsolete("Deprecated in DNN 9.11.1. Use DotNetNuke.Entities.Portals.Templates.PortalTemplateInfo instead. Scheduled removal in v11.0.0.")]
